@@ -1,0 +1,24 @@
+#!/usr/bin/env groovy
+
+// A simple example of running stages on master and slaves
+
+node ('master'){
+    stage ('Build on master'){
+        echo 'Running on master'
+        sh 'hostname; touch file.master'
+    }
+}
+
+node ('agent1'){
+    stage ('Build on agent1'){
+        echo 'Running on agent1'
+        sh 'hostname; touch file.agent1'
+    }
+}
+
+node ('agent2'){
+    stage ('Build on agent2'){
+        echo 'Running on agent2'
+        sh 'hostname; touch file.agent2'
+    }
+}
