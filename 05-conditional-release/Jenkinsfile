@@ -1,0 +1,65 @@
+#!/usr/bin/env groovy
+
+/* A combined example of
+- Parameters with default values
+- Pipeline script syntax inside a declarative pipeline
+- Debug build based on boolean parameter (DEBUG_BUILD)
+- Stage execution based on boolean parameter (RELEASE)
+ */
+
+pipeline {
+    agent { label 'master' }
+    parameters {
+        string (name: 'CUSTOM_TEXT', defaultValue: 'Whatever you want', description: 'Custom text that will be written to log')
+        booleanParam (name: 'DEBUG_BUILD', defaultValue: true, description: 'Add debug info to build')
+        booleanParam (name: 'RELEASE', defaultValue: false, description: 'Release a successful build? (master branch only!)')
+    }
+    tools {
+        // The M3 maven tool must be already configured in
+        // Manage Jenkins -> Global Tool Configuration -> Maven
+        maven 'M3'
+    }
+    stages {
+        stage('Clone sources') {
+            steps {
+                git 'https://github.com/JFrogDev/project-examples'
+            }
+        }
+        stage('Maven build') {
+            steps {
+                echo "---------- CUSTOM_TEXT: ${params.CUSTOM_TEXT} ----------"
+                echo "---------- DEBUG_BUILD: ${params.DEBUG_BUILD} ----------"
+
+                // Use a script block to write with a pipeline script syntax
+                script {
+                    if (env.DEBUG_BUILD.equals('true')) {
+                        env.mvnCommand = 'mvn -X -Dmaven.test.failure.ignore clean package'
+                    }
+                    else {
+                        env.mvnCommand = 'mvn -Dmaven.test.failure.ignore clean package'
+                    }
+                    echo "Running command: ${env.mvnCommand}"
+                    sh "cd maven-example; ${env.mvnCommand}"
+                }
+            }
+        }
+        stage('Test report') {
+            steps {
+                junit 'maven-example/**/target/surefire-reports/TEST-*.xml'
+            }
+        }
+        stage('Archive') {
+            steps {
+                archive 'maven-example/**/target/*.war'
+            }
+        }
+        stage('Release') {
+            when {
+                expression { return params.RELEASE }
+            }
+            steps {
+                echo 'Release is done here '
+            }
+        }
+    }
+}
