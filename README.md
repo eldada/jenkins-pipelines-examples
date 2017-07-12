@@ -9,6 +9,7 @@ The setup is installed and run in a [Vagrant](https://www.vagrantup.com/) image.
 ### Spin up the Vagrant VM
 Run the following in the root of the repository
 ```bash
+# Spin up the Vagrant VM
 $ vagrant up
 
 # Once finished, ssh into VM
@@ -42,6 +43,7 @@ $ docker run -d --name jenkins -p 8080:8080 -p 50000:50000 -v /var/run/docker.so
 - Browse to http://192.168.17.17:8080 and complete the initial setup wizard
   - Get initial admin password from `docker logs jenkins` output
   - Install suggested plugins
+  - Install the Blue Ocean plugin (recommended)
 - Define two Jenkins agents (slaves)
   - Create two nodes from the `Manage Jenkins` -> `Manage Nodes`
   - Call the nodes `agent1` and `agent2`
@@ -52,8 +54,10 @@ $ docker run -d --name jenkins -p 8080:8080 -p 50000:50000 -v /var/run/docker.so
 ### Start two Jenkins agents (slaves)
 Once you have the tokens for the agents, start the two agents
 ```bash
+# Start agent 1
 $ docker run -d --link jenkins:jenkins-server --name agent1 jenkinsci/jnlp-slave:3.7-1 -url http://jenkins-server:8080 ${AGENT1_TOKEN} agent1
 
+# Start agent 2
 $ docker run -d --link jenkins:jenkins-server --name agent2 jenkinsci/jnlp-slave:3.7-1 -url http://jenkins-server:8080 ${AGENT2_TOKEN} agent2
 
 ```
