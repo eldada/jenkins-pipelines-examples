@@ -4,16 +4,50 @@ Keep a few examples of Jenkins Pipelines. Mostly used for demo and training.
 ## Setup Local Jenkins
 These examples assume a simple setup of a single Jenkins master and two agents.
 
-### Start a local Jenkins master
-- Start a Jnekins master
+The setup is installed and run in a [Vagrant](https://www.vagrantup.com/) image.
+
+### Spin up the Vagrant VM
+Run the following in the root of the repository
 ```bash
-$ docker run -d --name jenkins -p 8080:8080 -p 50000:50000 -v ~/.jenkins_home:/var/jenkins_home jenkins:2.60.1
+$ vagrant up
+
+# Once finished, ssh into VM
+$ vagrant ssh
 ```
-- Browse to http://localhost:8080 and complete the initial setup wizard
-- Create two nodes from the `Manage Jenkins` -> `Manage Nodes`
+
+### Start a local Jenkins master
+- Build the custom Jenkins Docker image
+```bash
+# Go into the directory that has the repository files
+$ cd /opt/provisioning/
+
+# Build the Jenkins Docker image
+$ docker build -t jenkinsx:1 -f jenkins/Dockerfile .
+```
+
+- Prepare directories and permissions
+```bash
+# Permissions on /var/run/docker.sock
+$ sudo chmod 666 /var/run/docker.sock
+
+# Directory for Jenkins home
+$ mkdir -p ~/jenkins_home
+$ chmod -R 777 ~/jenkins_home
+```
+
+- Start the Jenkins master
+```bash
+$ docker run -d --name jenkins -p 8080:8080 -p 50000:50000 -v /var/run/docker.sock:/var/run/docker.sock -v ~/jenkins_home:/var/jenkins_home jenkinsx:1
+```
+- Browse to http://192.168.17.17:8080 and complete the initial setup wizard
+  - Get initial admin password from `docker logs jenkins` output
+  - Install suggested plugins
+- Define two Jenkins agents (slaves)
+  - Create two nodes from the `Manage Jenkins` -> `Manage Nodes`
   - Call the nodes `agent1` and `agent2`
+  - Set remote root directory to `/home/jenkins`
   - Configure them to `Launch method` -> `Launch agent via Java Web Start`
-  - Get the secret token for each node (AGENT1_TOKEN and AGENT2_TOKEN)
+  - Get the secret token for each node (**AGENT1_TOKEN** and **AGENT2_TOKEN**)
 
 ### Start two Jenkins agents (slaves)
 Once you have the tokens for the agents, start the two agents
