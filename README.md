@@ -43,7 +43,8 @@ $ docker run -d --name jenkins -p 8080:8080 -p 50000:50000 -v /var/run/docker.so
 - Browse to http://192.168.17.17:8080 and complete the initial setup wizard
   - Get initial admin password from `docker logs jenkins` output
   - Install suggested plugins
-  - Install the Blue Ocean plugin (recommended)
+  - Install the **Docker Slaves Plugin** (for dynamic Docker agent provisioning per build)
+  - Install the **Blue Ocean plugin** (recommended)
 - Define two Jenkins agents (slaves)
   - Create two nodes from the `Manage Jenkins` -> `Manage Nodes`
   - Call the nodes `agent1` and `agent2`

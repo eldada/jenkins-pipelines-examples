@@ -1,0 +1,20 @@
+#!/usr/bin/env groovy
+
+// An example of using a dynamically allocated Docker slave
+// Must have the Docker Slaves Plugin installed!
+
+dockerNode (image: "maven:3.3.3-jdk-8") {
+    stage ('Maven Build'){
+        echo '========= Building JFrog project-examples ========='
+        git "https://github.com/JFrogDev/project-examples"
+        sh 'mkdir -p /tmp/.m2; cd maven-example; mvn -Dmaven.test.failure.ignore -Dmaven.repo.local=/tmp/.m2 clean package'
+    }
+    stage ('Unit Tests') {
+        echo '========= Unit tests ========='
+        junit 'maven-example/**/target/surefire-reports/TEST-*.xml'
+    }
+    stage ('Archive') {
+        echo '========= Archiving war files  ========='
+        archive 'maven-example/**/target/*.war'
+    }
+}
