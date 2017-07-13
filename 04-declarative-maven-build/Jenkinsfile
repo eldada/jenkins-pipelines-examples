@@ -13,6 +13,15 @@ pipeline {
         maven 'M3'
     }
 
+    // Global options for configuration applied to the whole job
+    options {
+        // Keep only 10 last build
+        buildDiscarder(logRotator(numToKeepStr:'10'))
+
+        // Timeout after 30 minutes
+        timeout(time: 30, unit: 'MINUTES')
+    }
+
     // Main build steps
     stages {
         stage('Clone sources') {
