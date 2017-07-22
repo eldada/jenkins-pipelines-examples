@@ -1,6 +1,10 @@
 # Jenkins Pipelines Examples
 Keep a few examples of Jenkins Pipelines. Mostly used for demo and training.
 
+Look in each directory and find the `Jenkinsfile` with the example. Mode details are in the Jenkinsfile comments.
+
+You are more than welcome to contribute, share and ask.
+
 ## Setup Local Jenkins
 These examples assume a simple setup of a single Jenkins master and two agents.
 
