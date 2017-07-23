@@ -26,8 +26,9 @@ pipeline {
         stage('Select') {
             steps {
                 script {
-                    // This sample code can be replaced with any code that can run and generate your options
+                    // This sample code can be replaced with any shell or groovy code that can run and generate your options
                     sh "echo 'Option 1\nOption 2\nOption 3' > ${WORKSPACE}/options"
+
                     list = readFile(file: "${WORKSPACE}/options")
                     option = input(
                             message: 'Select option', ok: 'Select',
@@ -35,24 +36,20 @@ pipeline {
                     )
                 }
                 echo "Selected option is: ${option}"
-
-                // Write option to file for later use
-                sh "echo -n ${option} > ${WORKSPACE}/selected_option"
             }
         }
         // This is to allow user to confirm hist selection (are you sure?)
         stage('Confirm') {
             steps {
                 script {
-                    selected_option = readFile(file: "${WORKSPACE}/selected_option")
                     confirm = input(
-                            message: "Are you sure about ${selected_option}?",
+                            message: "Are you sure about ${option}?",
                             parameters: [booleanParam(name: 'Yes!', defaultValue: false, description: '')]
                     )
 
                     // Proceed or abort
                     if (confirm) {
-                        echo "Confirmed. Proceeding with ${selected_option}..."
+                        echo "Confirmed. Proceeding with ${option}..."
                     } else {
                         echo "Aborted on user action"
                         sh "exit 1"
@@ -66,10 +63,10 @@ pipeline {
             steps {
                 parallel (
                     Thread1: {
-                        sh "echo Thread 1 running with option $(cat ${WORKSPACE}/selected_option)"
+                        sh "echo Thread 1 running with option ${option}"
                     },
                     Thread2: {
-                        sh "echo Thread 2 running with option $(cat ${WORKSPACE}/selected_option)"
+                        sh "echo Thread 2 running with option ${option}"
                     }
                 )
             }
